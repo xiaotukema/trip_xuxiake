@@ -1,0 +1,17 @@
+{
+  "name": "trip-xuxiake",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI travel planner prototype for itinerary planning, booking links, navigation and translation.",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "check": "node --check app.js"
+  },
+  "keywords": [
+    "travel",
+    "itinerary",
+    "ai",
+    "navigation"
+  ],
+  "license": "MIT"
+}
