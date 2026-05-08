@@ -80,6 +80,46 @@ const state = {
   plans: [],
   activePlanIndex: 0,
   savedTrips: migrateSavedTrips(JSON.parse(localStorage.getItem("trip-xuxiake.savedTrips") || "[]"))
+const state = {
+  plans: [],
+  activePlanIndex: 0,
+  savedTrips: JSON.parse(localStorage.getItem("trip-xuxiake.savedTrips") || "[]")
+};
+
+const destinationSeeds = {
+  厦门: {
+    pois: ["鼓浪屿", "沙坡尾", "厦门园林植物园", "环岛路", "八市", "集美学村", "曾厝垵", "钟鼓索道"],
+    photoSpots: ["日光岩俯拍红屋顶", "沙坡尾避风坞彩色墙", "植物园雨林喷雾步道", "环岛路黄厝海滩日落"],
+    food: ["沙茶面", "海蛎煎", "花生汤"]
+  },
+  北京: {
+    pois: ["故宫", "景山公园", "天坛", "什刹海", "颐和园", "国家博物馆", "前门", "慕田峪长城"],
+    photoSpots: ["景山万春亭俯拍中轴线", "故宫角楼晨光", "天坛祈年殿回音壁外侧", "长城敌楼转角"],
+    food: ["烤鸭", "炸酱面", "豆汁焦圈"]
+  },
+  成都: {
+    pois: ["武侯祠", "锦里", "人民公园", "宽窄巷子", "熊猫基地", "青城山", "都江堰", "太古里"],
+    photoSpots: ["熊猫基地月亮产房外步道", "人民公园鹤鸣茶社", "都江堰鱼嘴分水堤", "太古里裸眼 3D 屏"],
+    food: ["火锅", "担担面", "蛋烘糕"]
+  },
+  默认: {
+    pois: ["城市地标", "老街市集", "博物馆", "滨水步道", "夜景观景台", "本地餐厅", "自然公园", "特色街区"],
+    photoSpots: ["地标广场对称机位", "老街转角招牌墙", "滨水步道日落位", "夜景观景台栏杆前景"],
+    food: ["本地小吃", "老字号", "咖啡甜品"]
+  }
+};
+
+const planStyles = [
+  { name: "松弛度假", pace: "慢节奏", multiplier: 1, focus: "海边/休闲/美食" },
+  { name: "奇观打卡", pace: "高效率", multiplier: 0.92, focus: "地标/拍照/夜景" },
+  { name: "文化深度", pace: "均衡", multiplier: 1.08, focus: "博物馆/街区/在地体验" }
+];
+
+const bookingProviders = {
+  travel: ["12306", "携程交通"],
+  hotel: ["酒店官网", "携程酒店"],
+  visit: ["景区官网", "携程门票"],
+  food: ["大众点评", "高德地图"]
 };
 
 const form = document.querySelector("#planner-form");
@@ -97,6 +137,17 @@ renderSavedTrips();
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   await generatePlansFromInput();
+
+generateInitialPlans();
+renderSavedTrips();
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = Object.fromEntries(new FormData(form).entries());
+  input.days = Number(input.days);
+  state.plans = buildPlans(input);
+  state.activePlanIndex = 0;
+  renderPlans();
 });
 
 document.querySelector("#clear-trips").addEventListener("click", () => {
@@ -261,6 +312,29 @@ function buildFallbackPlans(input, sourceNote) {
       budget,
       dataFreshness: "本地预览估算，非实时价格",
       sourceNote,
+function generateInitialPlans() {
+  const input = Object.fromEntries(new FormData(form).entries());
+  input.days = Number(input.days);
+  state.plans = buildPlans(input);
+  renderPlans();
+}
+
+function buildPlans(input) {
+  const seed = destinationSeeds[input.destination] || destinationSeeds.默认;
+  return planStyles.map((style, styleIndex) => {
+    const days = Array.from({ length: input.days }, (_, dayIndex) => buildDay(input, seed, style, styleIndex, dayIndex));
+    const baseBudget = input.budget === "经济" ? 1800 : input.budget === "高端" ? 7600 : 4200;
+    return {
+      id: crypto.randomUUID(),
+      title: `${input.destination}${style.name}${input.days}日方案`,
+      origin: input.origin,
+      destination: input.destination,
+      budget: input.budget,
+      preferences: input.preferences,
+      style,
+      days,
+      estimatedCost: Math.round(baseBudget * style.multiplier),
+      bookingStatus: "待关联",
       updatedAt: new Date().toISOString()
     };
   });
@@ -282,6 +356,13 @@ function buildDay(input, destination, style, dayIndex) {
   const hotel = `${destination.city}${input.budgetTier}型酒店`;
   const photoSpot = destination.photoSpots[dayIndex % destination.photoSpots.length];
   const factor = style.costFactor;
+function buildDay(input, seed, style, styleIndex, dayIndex) {
+  const start = (dayIndex * 2 + styleIndex) % seed.pois.length;
+  const poiA = seed.pois[start];
+  const poiB = seed.pois[(start + 1) % seed.pois.length];
+  const food = seed.food[(dayIndex + styleIndex) % seed.food.length];
+  const hotel = `${input.destination}${input.budget}精选酒店`;
+  const photoSpot = seed.photoSpots[(dayIndex + styleIndex) % seed.photoSpots.length];
   return {
     id: crypto.randomUUID(),
     label: `Day ${dayIndex + 1}`,
@@ -308,6 +389,16 @@ function estimateSegmentCost(type, tier, factor) {
 }
 
 function createSegment({ type, time, title, description, cost }) {
+      createSegment("travel", "09:00", dayIndex === 0 ? `${input.origin} → ${input.destination}` : `${hotel} → ${poiA}`, `${style.pace}交通路线，优先选择少换乘方案。`),
+      createSegment("visit", "10:30", poiA, `游览重点：${input.preferences || style.focus}；拍照点：${photoSpot}。`),
+      createSegment("food", "12:30", `${food}午餐`, `根据预算选择附近高评分餐厅，保留排队与休息时间。`),
+      createSegment("visit", "14:30", poiB, `结合官方开放时间与授权攻略热度，安排下午核心体验。`),
+      createSegment("hotel", "19:00", hotel, `住宿链接可关联酒店官网或 OTA，支持后续价格跟踪。`)
+    ]
+  };
+}
+
+function createSegment(type, time, title, description) {
   return {
     id: crypto.randomUUID(),
     type,
@@ -316,6 +407,7 @@ function createSegment({ type, time, title, description, cost }) {
     description,
     cost,
     bookingLinks: (BOOKING_PROVIDERS[type] || BOOKING_PROVIDERS.visit).map((provider) => ({
+    bookingLinks: (bookingProviders[type] || ["官方链接"]).map((provider) => ({
       provider,
       url: `https://www.baidu.com/s?wd=${encodeURIComponent(`${title} ${provider} 预订`)}`
     }))
@@ -355,6 +447,14 @@ function renderPlans() {
         <div class="metric"><span>门票/体验</span><strong>¥${formatRange(plan.budget.categories.visit)}</strong></div>
       </div>
       <p class="source-note">${plan.dataFreshness} · ${plan.sourceNote}</p>
+      <h3>${plan.title}</h3>
+      <p class="muted">从 ${plan.origin} 出发 · 偏好：${plan.preferences || "未填写"} · ${plan.style.pace}</p>
+      <div class="plan-summary">
+        <div class="metric"><span>预计预算</span><strong>¥${plan.estimatedCost}</strong></div>
+        <div class="metric"><span>旅行天数</span><strong>${plan.days.length} 天</strong></div>
+        <div class="metric"><span>方案风格</span><strong>${plan.style.name}</strong></div>
+        <div class="metric"><span>预订状态</span><strong>${plan.bookingStatus}</strong></div>
+      </div>
       <div class="days">${plan.days.map(renderDay).join("")}</div>
       <div class="segment-tools">
         <button data-save-plan="${index}">确认并保存到我的行程</button>
@@ -372,6 +472,7 @@ function renderTabs() {
     <button role="tab" class="${index === state.activePlanIndex ? "active" : ""}" aria-selected="${index === state.activePlanIndex}" data-tab="${index}">
       <strong>${plan.destination}</strong>
       <small>${plan.style.name} · ¥${plan.budget.min.toLocaleString()}-${plan.budget.max.toLocaleString()}</small>
+      ${plan.style.name}
     </button>
   `).join("");
   tabs.querySelectorAll("button").forEach((button) => {
@@ -402,6 +503,13 @@ function renderSegment(segment) {
         <h4>${segment.title}</h4>
         <p>${segment.description}</p>
         <small class="cost-source">${cost.source}</small>
+  const links = segment.bookingLinks.map((link) => `<a href="${link.url}" target="_blank" rel="noopener">${link.provider}</a>`).join("");
+  return `
+    <article class="segment-card" data-segment-id="${segment.id}">
+      <div class="segment-time">${segment.time}</div>
+      <div>
+        <h4>${segment.title}</h4>
+        <p>${segment.description}</p>
         <div class="booking-links">${links}</div>
       </div>
     </article>
@@ -430,6 +538,7 @@ function renderSavedTrips() {
     <article class="trip-card" data-trip-index="${tripIndex}">
       <button class="trip-header" data-toggle-trip="${tripIndex}">
         <span><strong>${trip.title}</strong><br><span class="muted">${trip.days.length} 天 · ¥${trip.budget.min.toLocaleString()}-${trip.budget.max.toLocaleString()} · ${new Date(trip.savedAt).toLocaleString("zh-CN")}</span></span>
+        <span><strong>${trip.title}</strong><br><span class="muted">${trip.days.length} 天 · ¥${trip.estimatedCost} · ${new Date(trip.savedAt).toLocaleString("zh-CN")}</span></span>
         <span>展开 / 收起</span>
       </button>
       <div class="trip-body">
@@ -504,6 +613,7 @@ function wireSavedTripEvents() {
         cost: estimateSegmentCost("visit", trip.budgetTier, 1)
       }));
       trip.budget = summarizeBudget(trip.days);
+      state.savedTrips[tripIndex].days[dayIndex].segments.push(createSegment("visit", "待定", title, "手动新增地点：保存后可重新计算时间冲突、交通与预订链接。"));
       persistTrips();
       renderSavedTrips();
       savedTripsEl.querySelector(`[data-trip-index="${tripIndex}"]`).classList.add("open");
@@ -519,6 +629,10 @@ function mutateSegment(payload, action) {
   if (action === "up" && segmentIndex > 0) [segments[segmentIndex - 1], segments[segmentIndex]] = [segments[segmentIndex], segments[segmentIndex - 1]];
   if (action === "down" && segmentIndex < segments.length - 1) [segments[segmentIndex + 1], segments[segmentIndex]] = [segments[segmentIndex], segments[segmentIndex + 1]];
   trip.budget = summarizeBudget(trip.days);
+  const segments = state.savedTrips[tripIndex].days[dayIndex].segments;
+  if (action === "remove") segments.splice(segmentIndex, 1);
+  if (action === "up" && segmentIndex > 0) [segments[segmentIndex - 1], segments[segmentIndex]] = [segments[segmentIndex], segments[segmentIndex - 1]];
+  if (action === "down" && segmentIndex < segments.length - 1) [segments[segmentIndex + 1], segments[segmentIndex]] = [segments[segmentIndex], segments[segmentIndex + 1]];
   persistTrips();
   renderSavedTrips();
   savedTripsEl.querySelector(`[data-trip-index="${tripIndex}"]`)?.classList.add("open");
@@ -533,6 +647,7 @@ function startTour(tripIndex) {
     return;
   }
   const destination = DESTINATION_CANDIDATES.find((candidate) => candidate.city === trip.destination) || DESTINATION_CANDIDATES[0];
+  const photoSpots = (destinationSeeds[trip.destination] || destinationSeeds.默认).photoSpots;
   tourAssistant.className = "tour-assistant";
   tourAssistant.innerHTML = `
     <h3>${trip.title}｜旅中助手已启动</h3>
@@ -540,6 +655,9 @@ function startTour(tripIndex) {
     <p>推荐路线：生产环境接入地图 SDK 后返回当前位置到下一站的公交/步行/驾车实时路线；离线状态下使用已缓存城市地图和行程点位。</p>
     <h4>下一站拍照出片点位</h4>
     <ul class="photo-list">${destination.photoSpots.map((spot) => `<li>${spot}：来自授权攻略摘要或人工审核点位，建议预留 15 分钟构图。</li>`).join("")}</ul>
+    <p>推荐路线：步行 8 分钟到最近地铁/公交站，公共交通约 24 分钟，末段步行 6 分钟。生产环境接入高德/Google/OSRM 返回实时路线与离线缓存。</p>
+    <h4>下一站拍照出片点位</h4>
+    <ul class="photo-list">${photoSpots.map((spot) => `<li>${spot}：建议广角镜头，预留 15 分钟排队与构图。</li>`).join("")}</ul>
     <div class="translation-box">
       <strong>旅行翻译</strong>
       <p>中文：请问去 ${next.title} 怎么走？</p>
