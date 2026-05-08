@@ -44,6 +44,7 @@ button.small { padding: 0.55rem 0.8rem; font-size: 0.85rem; }
   color: #fff;
 }
 
+.topbar, .section-heading, .trip-header, .segment-tools, .route-line, .plan-title-row {
 .topbar, .section-heading, .trip-header, .segment-tools, .route-line {
   display: flex;
   align-items: center;
@@ -54,6 +55,9 @@ button.small { padding: 0.55rem 0.8rem; font-size: 0.85rem; }
 .brand { display: flex; align-items: center; gap: 0.65rem; font-size: 1.2rem; font-weight: 800; }
 .brand-mark { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 0.9rem; background: #fff; color: var(--brand); }
 .ghost-link { color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.5); padding: .55rem .9rem; border-radius: 999px; }
+.hero-copy { max-width: 62rem; padding: 4rem 0 1rem; }
+.hero h1 { font-size: clamp(2rem, 6vw, 4.8rem); line-height: 1.04; margin: 0.3rem 0 1.2rem; letter-spacing: -0.05em; }
+.hero p { font-size: 1.08rem; line-height: 1.8; max-width: 54rem; }
 .hero-copy { max-width: 58rem; padding: 4rem 0 1rem; }
 .hero h1 { font-size: clamp(2rem, 6vw, 4.8rem); line-height: 1.04; margin: 0.3rem 0 1.2rem; letter-spacing: -0.05em; }
 .hero p { font-size: 1.08rem; line-height: 1.8; max-width: 52rem; }
@@ -65,6 +69,30 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .muted { color: var(--muted); line-height: 1.7; }
 
 .planner-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.planner-form label, .preference-fieldset { color: var(--muted); font-size: .9rem; font-weight: 700; }
+.planner-form input, .planner-form select { width: 100%; margin-top: .45rem; border: 1px solid var(--line); border-radius: 1rem; padding: .9rem 1rem; background: #fff; color: var(--ink); }
+.planner-form .wide, .preference-fieldset, .status-text { grid-column: 1 / -1; }
+.planner-form button { align-self: end; }
+.preference-fieldset { border: 1px solid var(--line); border-radius: 1.2rem; padding: 1rem; background: #fbfdff; }
+.preference-fieldset legend { padding: 0 .4rem; color: var(--ink); }
+.preference-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .7rem; margin-top: .4rem; }
+.preference-chip { display: block; }
+.preference-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.preference-chip span { display: grid; gap: .2rem; height: 100%; padding: .75rem; border: 1px solid var(--line); border-radius: 1rem; background: #fff; color: var(--ink); cursor: pointer; }
+.preference-chip small { color: var(--muted); font-weight: 500; line-height: 1.35; }
+.preference-chip input:checked + span { border-color: var(--brand); background: #e7f7f4; box-shadow: inset 0 0 0 1px var(--brand); }
+.status-text { min-height: 1.4rem; margin: 0; color: var(--muted); }
+.status-text[data-type="success"] { color: var(--brand); }
+.status-text[data-type="warning"] { color: #b45309; }
+
+.tab-actions { display: flex; overflow-x: auto; padding-bottom: .25rem; max-width: 100%; }
+.tab-actions button { display: grid; gap: .15rem; background: #edf5f4; color: var(--brand); box-shadow: none; white-space: nowrap; text-align: left; }
+.tab-actions button small { color: inherit; opacity: .8; font-weight: 700; }
+.tab-actions button.active { background: var(--brand); color: #fff; }
+.plan-carousel { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; border-radius: 1.4rem; }
+.plan-card { scroll-snap-align: start; padding: 1rem; }
+.plan-card h3 { margin: 0 0 .35rem; }
+.budget-pill { flex: 0 0 auto; border-radius: 999px; padding: .8rem 1rem; background: #fff7ed; color: #9a3412; font-weight: 900; border: 1px solid #fed7aa; }
 .planner-form label { color: var(--muted); font-size: .9rem; font-weight: 700; }
 .planner-form input, .planner-form select { width: 100%; margin-top: .45rem; border: 1px solid var(--line); border-radius: 1rem; padding: .9rem 1rem; background: #fff; color: var(--ink); }
 .planner-form .wide { grid-column: span 3; }
@@ -79,10 +107,15 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .metric { background: #f7fafc; border: 1px solid var(--line); border-radius: 1.1rem; padding: 1rem; }
 .metric span { display: block; color: var(--muted); font-size: .82rem; }
 .metric strong { display: block; margin-top: .25rem; font-size: 1.1rem; }
+.source-note, .cost-source { color: #8a6d3b; background: #fffbeb; border: 1px solid #fde68a; border-radius: .8rem; padding: .5rem .7rem; line-height: 1.5; }
+.cost-source { display: inline-block; margin-bottom: .55rem; font-size: .78rem; }
 .days { display: grid; gap: 1rem; }
 .day-card { border: 1px solid var(--line); border-radius: 1.4rem; padding: 1rem; background: linear-gradient(180deg, #fff, #f8fbff); }
 .day-card h3 { margin: 0 0 .8rem; }
 .segment-list { display: grid; gap: .75rem; }
+.segment-card { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: .9rem; border: 1px solid #e8eef6; border-radius: 1rem; background: #fff; }
+.segment-time { color: var(--brand); font-weight: 900; }
+.segment-time span { display: block; margin-top: .3rem; color: #9a3412; font-size: .8rem; }
 .segment-card { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; padding: .9rem; border: 1px solid #e8eef6; border-radius: 1rem; background: #fff; }
 .segment-time { color: var(--brand); font-weight: 900; }
 .segment-card h4 { margin: 0 0 .25rem; }
@@ -109,6 +142,17 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .compliance article { border: 1px solid var(--line); border-radius: 1.2rem; padding: 1rem; background: #fff; }
 .compliance p { color: var(--muted); line-height: 1.7; }
 
+@media (max-width: 980px) {
+  .planner, .live { grid-template-columns: 1fr; }
+  .planner-form, .plan-summary, .compliance-grid { grid-template-columns: 1fr; }
+  .preference-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .section-heading, .plan-title-row { align-items: flex-start; flex-direction: column; }
+  .segment-card { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .preference-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 860px) {
   .planner, .live { grid-template-columns: 1fr; }
   .planner-form, .plan-summary, .compliance-grid { grid-template-columns: 1fr; }

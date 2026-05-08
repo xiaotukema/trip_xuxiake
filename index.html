@@ -14,6 +14,9 @@
       </nav>
       <section class="hero-copy">
         <p class="eyebrow">规划 · 预订 · 导航 · 翻译</p>
+        <h1>只输入出发地和旅行偏好，让 AI 先帮你决定去哪儿。</h1>
+        <p>
+          根据出发地、天数、预算档位和点选式偏好，调用大模型与授权 OTA/攻略内容源生成 2～3 套目的地方案；每个方案在 Tab 上直接展示预算范围，确认后可保存、编辑、关联预订并进入旅中导航翻译。
         <h1>把散落在攻略、地图和 OTA 里的旅行信息，整理成可执行的智能行程。</h1>
         <p>
           输入偏好、预算与旅行天数，生成 2～3 套可横向切换的方案；确认后保存到「我的行程」，支持编辑路线、关联官方/OTA 预订链接，并在旅中查看导航、拍照点位和翻译助手。
@@ -25,12 +28,47 @@
       <section class="panel planner" aria-labelledby="planner-title">
         <div>
           <p class="section-kicker">AI 行程规划</p>
+          <h2 id="planner-title">告诉我你从哪里出发、喜欢什么</h2>
+          <p class="muted">目的地不需要手动填写。生产环境应由后端大模型服务结合授权 OTA 价格、官方 POI、地图和合规 UGC 摘要进行推荐；本地预览会在接口不可用时启用透明后备方案。</p>
           <h2 id="planner-title">告诉我你想怎样旅行</h2>
           <p class="muted">MVP 使用本地规则引擎模拟 AI 规划；生产环境可接入 LLM、地图、天气、OTA 官方 API 与授权 UGC 内容源。</p>
         </div>
         <form id="planner-form" class="planner-form">
           <label>
             出发地
+            <input name="origin" value="上海" placeholder="如：上海、北京、深圳" required />
+          </label>
+          <label>
+            旅行天数
+            <input name="days" type="number" min="2" max="10" value="4" required />
+          </label>
+          <label>
+            预算档位
+            <select name="budgetTier">
+              <option value="舒适">舒适：兼顾品质与价格</option>
+              <option value="经济">经济：高性价比优先</option>
+              <option value="高端">高端：舒适酒店与直达交通</option>
+            </select>
+          </label>
+          <label>
+            同行人
+            <select name="groupType">
+              <option value="情侣/朋友">情侣/朋友</option>
+              <option value="亲子家庭">亲子家庭</option>
+              <option value="独自旅行">独自旅行</option>
+              <option value="长辈同行">长辈同行</option>
+            </select>
+          </label>
+          <fieldset class="wide preference-fieldset">
+            <legend>旅行偏好（来自 OTA/攻略平台常见标签，可多选）</legend>
+            <div class="preference-grid" id="preference-grid"></div>
+          </fieldset>
+          <label class="wide">
+            大模型规划接口（可选）
+            <input name="aiEndpoint" placeholder="如：https://your-domain.com/api/ai/itineraries；留空则使用本地预览后备" />
+          </label>
+          <p id="planner-status" class="status-text" aria-live="polite"></p>
+          <button type="submit">AI 推荐目的地与 3 套方案</button>
             <input name="origin" value="上海" placeholder="如：上海" required />
           </label>
           <label>
@@ -83,6 +121,7 @@
         <div>
           <p class="section-kicker">旅中服务</p>
           <h2 id="live-title">开始游览：导航、拍照点与翻译</h2>
+          <p class="muted">点击行程卡片中的「开始游览」后，这里会展示当前位置到下一站的路线建议、授权攻略内容整理出的拍照点位，以及常用旅行短句翻译。</p>
           <p class="muted">点击行程卡片中的「开始游览」后，这里会展示当前位置到下一站的路线建议、UGC 授权内容整理出的拍照点位，以及常用旅行短句翻译。</p>
         </div>
         <div id="tour-assistant" class="tour-assistant empty">尚未开始行程。请先保存并展开一个行程。</div>
@@ -90,6 +129,19 @@
 
       <section class="panel compliance" aria-labelledby="compliance-title">
         <p class="section-kicker">合规数据接入</p>
+        <h2 id="compliance-title">用授权数据增强大模型，而不是违规绕过平台爬取</h2>
+        <div class="compliance-grid">
+          <article>
+            <h3>授权/官方 API 优先</h3>
+            <p>携程、飞猪、同程、航司、酒店、景区、地图等价格和库存应通过开放平台、商务合作或官方 API 接入，再交给大模型做结构化规划。</p>
+          </article>
+          <article>
+            <h3>UGC 来源可追溯</h3>
+            <p>小红书、抖音等社媒内容只支持官方授权、达人合作或用户主动导入；每条拍照点保留来源、更新时间、热度和置信度。</p>
+          </article>
+          <article>
+            <h3>预算可解释</h3>
+            <p>每个方案预算由交通、住宿、餐饮、门票/体验分项累加，Tab 上直接展示总价区间，卡片内展示明细和价格来源状态。</p>
         <h2 id="compliance-title">攻略内容不做未授权爬取</h2>
         <div class="compliance-grid">
           <article>
