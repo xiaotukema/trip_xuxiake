@@ -45,7 +45,6 @@ button.small { padding: 0.55rem 0.8rem; font-size: 0.85rem; }
 }
 
 .topbar, .section-heading, .trip-header, .segment-tools, .route-line, .plan-title-row {
-.topbar, .section-heading, .trip-header, .segment-tools, .route-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -58,9 +57,6 @@ button.small { padding: 0.55rem 0.8rem; font-size: 0.85rem; }
 .hero-copy { max-width: 62rem; padding: 4rem 0 1rem; }
 .hero h1 { font-size: clamp(2rem, 6vw, 4.8rem); line-height: 1.04; margin: 0.3rem 0 1.2rem; letter-spacing: -0.05em; }
 .hero p { font-size: 1.08rem; line-height: 1.8; max-width: 54rem; }
-.hero-copy { max-width: 58rem; padding: 4rem 0 1rem; }
-.hero h1 { font-size: clamp(2rem, 6vw, 4.8rem); line-height: 1.04; margin: 0.3rem 0 1.2rem; letter-spacing: -0.05em; }
-.hero p { font-size: 1.08rem; line-height: 1.8; max-width: 52rem; }
 .eyebrow, .section-kicker { margin: 0 0 .4rem; letter-spacing: .15em; text-transform: uppercase; font-weight: 800; color: var(--accent); }
 
 main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
@@ -70,7 +66,9 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 
 .planner-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .planner-form label, .preference-fieldset { color: var(--muted); font-size: .9rem; font-weight: 700; }
-.planner-form input, .planner-form select { width: 100%; margin-top: .45rem; border: 1px solid var(--line); border-radius: 1rem; padding: .9rem 1rem; background: #fff; color: var(--ink); }
+.planner-form input, .planner-form select, .planner-form textarea { width: 100%; margin-top: .45rem; border: 1px solid var(--line); border-radius: 1rem; padding: .9rem 1rem; background: #fff; color: var(--ink); }
+.planner-form textarea { resize: vertical; line-height: 1.6; }
+button:disabled { cursor: wait; opacity: .72; }
 .planner-form .wide, .preference-fieldset, .status-text { grid-column: 1 / -1; }
 .planner-form button { align-self: end; }
 .preference-fieldset { border: 1px solid var(--line); border-radius: 1.2rem; padding: 1rem; background: #fbfdff; }
@@ -84,6 +82,12 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .status-text { min-height: 1.4rem; margin: 0; color: var(--muted); }
 .status-text[data-type="success"] { color: var(--brand); }
 .status-text[data-type="warning"] { color: #b45309; }
+.advanced-settings { border: 1px dashed var(--line); border-radius: 1rem; padding: .85rem 1rem; background: #f8fbff; color: var(--muted); }
+.advanced-settings summary { cursor: pointer; color: var(--ink); font-weight: 800; }
+.empty-plans { min-height: 18rem; display: grid; place-items: center; align-content: center; gap: .6rem; text-align: center; padding: 2rem; border: 1px dashed var(--line); border-radius: 1.4rem; background: linear-gradient(180deg, #fff, #f8fbff); }
+.empty-plans h3, .empty-plans p { margin: 0; }
+.empty-plans p { max-width: 32rem; color: var(--muted); line-height: 1.7; }
+.empty-icon { display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1.4rem; background: #e7f7f4; font-size: 2rem; }
 
 .tab-actions { display: flex; overflow-x: auto; padding-bottom: .25rem; max-width: 100%; }
 .tab-actions button { display: grid; gap: .15rem; background: #edf5f4; color: var(--brand); box-shadow: none; white-space: nowrap; text-align: left; }
@@ -93,16 +97,6 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .plan-card { scroll-snap-align: start; padding: 1rem; }
 .plan-card h3 { margin: 0 0 .35rem; }
 .budget-pill { flex: 0 0 auto; border-radius: 999px; padding: .8rem 1rem; background: #fff7ed; color: #9a3412; font-weight: 900; border: 1px solid #fed7aa; }
-.planner-form label { color: var(--muted); font-size: .9rem; font-weight: 700; }
-.planner-form input, .planner-form select { width: 100%; margin-top: .45rem; border: 1px solid var(--line); border-radius: 1rem; padding: .9rem 1rem; background: #fff; color: var(--ink); }
-.planner-form .wide { grid-column: span 3; }
-.planner-form button { align-self: end; }
-
-.tab-actions { overflow-x: auto; padding-bottom: .25rem; }
-.tab-actions button { background: #edf5f4; color: var(--brand); box-shadow: none; white-space: nowrap; }
-.tab-actions button.active { background: var(--brand); color: #fff; }
-.plan-carousel { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; border-radius: 1.4rem; }
-.plan-card { scroll-snap-align: start; padding: 1rem; }
 .plan-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; margin: 1rem 0; }
 .metric { background: #f7fafc; border: 1px solid var(--line); border-radius: 1.1rem; padding: 1rem; }
 .metric span { display: block; color: var(--muted); font-size: .82rem; }
@@ -116,8 +110,6 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 .segment-card { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: .9rem; border: 1px solid #e8eef6; border-radius: 1rem; background: #fff; }
 .segment-time { color: var(--brand); font-weight: 900; }
 .segment-time span { display: block; margin-top: .3rem; color: #9a3412; font-size: .8rem; }
-.segment-card { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; padding: .9rem; border: 1px solid #e8eef6; border-radius: 1rem; background: #fff; }
-.segment-time { color: var(--brand); font-weight: 900; }
 .segment-card h4 { margin: 0 0 .25rem; }
 .segment-card p { margin: 0 0 .5rem; color: var(--muted); line-height: 1.55; }
 .booking-links { display: flex; flex-wrap: wrap; gap: .45rem; }
@@ -152,11 +144,4 @@ main { width: min(1180px, calc(100% - 2rem)); margin: -2rem auto 4rem; }
 
 @media (max-width: 560px) {
   .preference-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 860px) {
-  .planner, .live { grid-template-columns: 1fr; }
-  .planner-form, .plan-summary, .compliance-grid { grid-template-columns: 1fr; }
-  .planner-form .wide { grid-column: auto; }
-  .section-heading { align-items: flex-start; flex-direction: column; }
-  .segment-card { grid-template-columns: 1fr; }
 }
